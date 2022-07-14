@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import './style.dart' as style; // import 할 때 변수 중복문제 피하기
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(
@@ -21,6 +23,20 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   var tab = 0;
 
+  getData() async {
+    var result = await http.get(Uri.parse('https://codingapple1.github.io/app/data.json'));
+    var result2 = jsonDecode(result.body);
+    print(result2);
+    // http.get 함수도 오래걸리는 함수임 (전문용어로 Future)
+  }
+
+  @override
+  void initState() {
+    super.initState(); // MyApp 위젯이 로드될 때 실행됨.
+    getData();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +49,7 @@ class _MyAppState extends State<MyApp> {
             iconSize: 30,
           ),
       ],),
-      body: [Text('홈'), Text('샵')][tab],
+      body: [Home(), Text('샵')][tab],
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,
         showUnselectedLabels: false,
@@ -49,5 +65,25 @@ class _MyAppState extends State<MyApp> {
       ],
       ),
     ); // Theme.of 로 원하는 ThemeData 안의 내용 쓸수있음
+  }
+}
+
+class Home extends StatelessWidget {
+  const Home({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(itemCount:3, itemBuilder:(c, i){
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Image.network('https://codingapple1.github.io/kona.jpg'),
+          Text('좋아요 100'),
+          Text('글쓴이'),
+          Text('글내용'),
+        ],
+
+      );
+    });
   }
 }
