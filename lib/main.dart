@@ -97,3 +97,21 @@ class Home extends StatelessWidget {
     }
   }
 }
+
+// FutureBuilder (
+//  future: http.get(어쩌구),
+//  builder: (context, snapshot) {
+//    if (snapshot.hasData) {
+//    return Text('post에 데이터 있으면 보여줄 위젯')
+//    }
+//    return Text('post에 데이터 없으면 보여줄 위젯')
+//    },
+//  )
+// 1. future: 안에는 Future를 담은 state 이름을 적으면 됩니다.
+// http.get() 이런거 직접 적어도 되긴 하지만 state에 저장했다가 쓰는게 좋을 수 있습니다.
+// 2. builder: (){return 어쩌구} 안의 코드는 입력한 state 데이터가 도착할 때 실행해줍니다.
+// 3. 그리고 snapshot 이라는 파라미터가 변화된 state 데이터를 의미합니다.
+// 그래서 아까와 같은 상황을 좀 더 매끄럽게 해결가능한데
+// 딱 한번 데이터가 도착하고
+// 도착시 위젯을 보여줘야할 경우 FutureBuilder가 유용할 수 있는데
+// 데이터가 추가되는 경우가 잦으면 불편해서 쓸모없습니다.
