@@ -5,6 +5,7 @@ import 'dart:convert';
 
 void main() {
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     theme: style.theme,
     home: MyApp(), // 복잡한 위젯은 복잡한위젯Theme() 안에서 스타일 줘야함
   ));
@@ -115,10 +116,3 @@ class Home extends StatelessWidget {
 // 도착시 위젯을 보여줘야할 경우 FutureBuilder가 유용할 수 있는데
 // 데이터가 추가되는 경우가 잦으면 불편해서 쓸모없습니다.
 
-// class _HomeState extends State<Home> {
-//   var scroll = ScrollController();
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     if (widget.data.isNotEmpty){
-//       return ListView.builder(itemCount: 3, controller: scroll, (생략)
