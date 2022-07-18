@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import './style.dart' as style; // import 할 때 변수 중복문제 피하기
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/rendering.dart'; // 스크롤 관련 유용함
 
 void main() {
   runApp(MaterialApp(
@@ -21,6 +22,12 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   var tab = 0;
   var data = [];
+
+  addData(a) {
+    setState((){
+      data.add(a);
+    });
+  }
 
   getData() async {
     var result = await http
@@ -51,7 +58,7 @@ class _MyAppState extends State<MyApp> {
           ),
         ],
       ),
-      body: [Home(data: data), Text('샵')][tab],
+      body: [Home(data: data, addData: addData,), Text('샵')][tab],
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,
         showUnselectedLabels: false,
@@ -72,23 +79,50 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class Home extends StatelessWidget {
-  const Home({Key? key, this.data}) : super(key: key);
+class Home extends StatefulWidget {
+  const Home({Key? key, this.data, this.addData}) : super(key: key);
   final data;
+  final addData;
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+
+  var scroll = ScrollController();
+
+  getMore() async {
+    var result = await http.get(Uri.parse('https://codingapple1.github.io/app/more1.json'));
+    var result2 = jsonDecode(result.body);
+    print(result2);
+    widget.addData(result2);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    scroll.addListener(() { // 필요없어지면 제거하는 것도 성능상 좋음
+      if (scroll.position.pixels == scroll.position.maxScrollExtent) {
+        getMore();
+        print(widget.data.length);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (data.isNotEmpty) {
+    if (widget.data.isNotEmpty) {
       return ListView.builder(
-          itemCount: 3,
+          itemCount: widget.data.length,
+          controller: scroll,
           itemBuilder: (c, i) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.network(data[i]['image']),
-                Text(data[i]['likes'].toString()),
-                Text(data[i]['user']),
-                Text(data[i]['content']),
+                Image.network(widget.data[i]['image']),
+                Text('좋아요 ${widget.data[i]['likes']}'),
+                Text(widget.data[i]['user']),
+                Text(widget.data[i]['content']),
               ],
             );
           });
