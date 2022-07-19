@@ -3,17 +3,19 @@ import './style.dart' as style; // import 할 때 변수 중복문제 피하기
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/rendering.dart'; // 스크롤 관련 유용함
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: style.theme,
-    initialRoute: '/',
-    routes: {
-      '/' : (c) => Text('첫페이지'),
-      '/detail' : (c) => Text('둘째페이지'), // 페이지 많으면 routes 사용해도됨
-    },
-    // home: MyApp(), // 복잡한 위젯은 복잡한위젯Theme() 안에서 스타일 줘야함
+    // initialRoute: '/',
+    // routes: {
+    //   '/' : (c) => Text('첫페이지'),
+    //   '/detail' : (c) => Text('둘째페이지'), // 페이지 많으면 routes 사용해도됨
+    // },
+    home: MyApp(), // 복잡한 위젯은 복잡한위젯Theme() 안에서 스타일 줘야함
   ));
 }
 
@@ -27,6 +29,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   var tab = 0;
   var data = [];
+  var userImage;
 
   addData(a) {
     setState((){
@@ -57,11 +60,20 @@ class _MyAppState extends State<MyApp> {
         title: Text('Instagram'),
         actions: [
           IconButton(
-            onPressed: () {
+            onPressed: () async {
+              var picker = ImagePicker();
+              var image = await picker.pickImage(source: ImageSource.gallery);
+              if (image != null) {
+                setState((){
+                  userImage = File(image.path);
+                });
+              }
+
+
               Navigator.push(context,
-                  MaterialPageRoute(builder: (c) => Upload(),)
+                MaterialPageRoute(builder: (c) => Upload(userImage: userImage)),
               );
-            },
+              },
             icon: Icon(Icons.add_box_outlined),
             iconSize: 30,
           ),
@@ -142,8 +154,8 @@ class _HomeState extends State<Home> {
 }
 
 class Upload extends StatelessWidget {
-  const Upload({Key? key}) : super(key: key);
-
+  const Upload({Key? key, this.userImage}) : super(key: key);
+  final userImage;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,7 +163,9 @@ class Upload extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Image.file(userImage),
           Text('이미지업로드화면'),
+          TextField(),
           IconButton(onPressed: (){
             Navigator.pop(context);
           }, icon: Icon(Icons.close)),
