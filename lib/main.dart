@@ -8,7 +8,12 @@ void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: style.theme,
-    home: MyApp(), // 복잡한 위젯은 복잡한위젯Theme() 안에서 스타일 줘야함
+    initialRoute: '/',
+    routes: {
+      '/' : (c) => Text('첫페이지'),
+      '/detail' : (c) => Text('둘째페이지'), // 페이지 많으면 routes 사용해도됨
+    },
+    // home: MyApp(), // 복잡한 위젯은 복잡한위젯Theme() 안에서 스타일 줘야함
   ));
 }
 
@@ -52,7 +57,11 @@ class _MyAppState extends State<MyApp> {
         title: Text('Instagram'),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (c) => Upload(),)
+              );
+            },
             icon: Icon(Icons.add_box_outlined),
             iconSize: 30,
           ),
@@ -129,6 +138,26 @@ class _HomeState extends State<Home> {
     } else {
       return Text('로딩중임');
     }
+  }
+}
+
+class Upload extends StatelessWidget {
+  const Upload({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('이미지업로드화면'),
+          IconButton(onPressed: (){
+            Navigator.pop(context);
+          }, icon: Icon(Icons.close)),
+        ],
+      ),
+    );
   }
 }
 
