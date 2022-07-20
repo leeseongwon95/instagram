@@ -30,6 +30,28 @@ class _MyAppState extends State<MyApp> {
   var tab = 0;
   var data = [];
   var userImage;
+  var userContent; // 유저가 입력한 글 저장공간
+
+  addMyData(){
+    var myData = { // 유저의 게시물 완성
+      'id': data.length, // 게시물의 유니크한 id
+      'image': userImage,
+      'likes': 5,
+      'date': 'July 25',
+      'content': userContent,
+      'liked': false,
+      'user': 'John Kim',
+    };
+    setState((){
+      data.insert(0, myData); // add 는 맨뒤에 추가되기때문에 insert 쓴거임
+    });
+  }
+
+  setUserContent(a){
+    setState((){
+      userContent = a;
+    });
+  }
 
   addData(a) {
     setState((){
@@ -70,8 +92,10 @@ class _MyAppState extends State<MyApp> {
               }
 
 
+              // ignore: use_build_context_synchronously
               Navigator.push(context,
-                MaterialPageRoute(builder: (c) => Upload(userImage: userImage)),
+                MaterialPageRoute(builder: (c) => Upload(
+                  userImage: userImage, setUserContent: setUserContent, addMyData: addMyData)),
               );
               },
             icon: Icon(Icons.add_box_outlined),
@@ -140,7 +164,10 @@ class _HomeState extends State<Home> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.network(widget.data[i]['image']),
+                widget.data[i]['image'].runtimeType == String
+                    ? Image.network(widget.data[i]['image'])
+                    : Image.file(widget.data[i]['image']) ,
+                //유저가 선택한 이미지는 _File타입임
                 Text('좋아요 ${widget.data[i]['likes']}'),
                 Text(widget.data[i]['user']),
                 Text(widget.data[i]['content']),
@@ -154,18 +181,28 @@ class _HomeState extends State<Home> {
 }
 
 class Upload extends StatelessWidget {
-  const Upload({Key? key, this.userImage}) : super(key: key);
+  const Upload({Key? key, this.userImage, this.setUserContent, this.addMyData}) : super(key: key);
   final userImage;
+  final setUserContent;
+  final addMyData;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar( actions: [
+        IconButton(onPressed: (){
+          addMyData();
+          }, icon: Icon(Icons.send))
+      ],),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Image.file(userImage),
           Text('이미지업로드화면'),
-          TextField(),
+          TextField(onChanged: (text){
+            setUserContent(text);
+          },),
           IconButton(onPressed: (){
             Navigator.pop(context);
           }, icon: Icon(Icons.close)),
