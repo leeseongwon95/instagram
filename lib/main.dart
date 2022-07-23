@@ -188,7 +188,18 @@ class _HomeState extends State<Home> {
                   onTap: (){
                     Navigator.push(
                       context,
-                      CupertinoPageRoute(builder: (c) => Profile()),
+                      PageRouteBuilder(
+                          pageBuilder: (c, a1, a2) => Profile(),
+                          transitionsBuilder: (c, a1, a2, child) =>
+                              SlideTransition(
+                                  position: Tween(
+                                    begin: Offset(-1.0, 0.0),
+                                    end: Offset(0.0, 0.0),
+                                  ).animate(a1),
+                                child: child,
+                              ),
+
+                      ),
                     );
                   },
                 ),
