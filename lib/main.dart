@@ -1,13 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import './style.dart' as style; // import 할 때 변수 중복문제 피하기
+import 'package:instagram/pages/upload.dart';
+import 'styles/style.dart' as style; // import 할 때 변수 중복문제 피하기
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/rendering.dart'; // 스크롤 관련 유용함
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
+import 'stores/store1.dart';
+import 'stores/store2.dart';
+import 'pages/home.dart';
 
 void main() {
   runApp(MultiProvider(
@@ -40,27 +43,6 @@ class _MyAppState extends State<MyApp> {
   var data = [];
   var userImage;
   // var userContent; // 유저가 입력한 글 저장공간
-
-  // addMyData(){
-  //   var myData = { // 유저의 게시물 완성
-  //     'id': data.length, // 게시물의 유니크한 id
-  //     'image': userImage,
-  //     'likes': 5,
-  //     'date': 'July 25',
-  //     'content': userContent,
-  //     'liked': false,
-  //     'user': 'John Kim',
-  //   };
-  //   setState((){
-  //     data.insert(0, myData); // add 는 맨뒤에 추가되기때문에 insert 쓴거임
-  //   });
-  // }
-
-  // setUserContent(a){
-  //   setState((){
-  //     userContent = a;
-  //   });
-  // }
 
   saveData() async {
     var storage = await SharedPreferences.getInstance();
@@ -145,165 +127,3 @@ class _MyAppState extends State<MyApp> {
     ); // Theme.of 로 원하는 ThemeData 안의 내용 쓸수있음
   }
 }
-
-class Home extends StatefulWidget {
-  const Home({Key? key, this.data, this.addData}) : super(key: key);
-  final data;
-  final addData;
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-
-  var scroll = ScrollController();
-
-  getMore() async {
-    var result = await http.get(Uri.parse('https://codingapple1.github.io/app/more1.json'));
-    var result2 = jsonDecode(result.body);
-    print(result2);
-    widget.addData(result2);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    scroll.addListener(() { // 필요없어지면 제거하는 것도 성능상 좋음
-      if (scroll.position.pixels == scroll.position.maxScrollExtent) {
-        getMore();
-        print(widget.data.length);
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.data.isNotEmpty) {
-      return ListView.builder(
-          itemCount: widget.data.length,
-          controller: scroll,
-          itemBuilder: (c, i) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                widget.data[i]['image'].runtimeType == String
-                    ? Image.network(widget.data[i]['image'])
-                    : Image.file(widget.data[i]['image']) ,
-                //유저가 선택한 이미지는 _File타입임
-                GestureDetector(
-                  child: Text(widget.data[i]['user']),
-                  onTap: (){
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                          pageBuilder: (c, a1, a2) => Profile(),
-                          transitionsBuilder: (c, a1, a2, child) =>
-                              SlideTransition(
-                                  position: Tween(
-                                    begin: Offset(-1.0, 0.0),
-                                    end: Offset(0.0, 0.0),
-                                  ).animate(a1),
-                                child: child,
-                              ),
-
-                      ),
-                    );
-                  },
-                ),
-                Text('좋아요 ${widget.data[i]['likes']}'),
-                Text(widget.data[i]['user']),
-                Text(widget.data[i]['content']),
-              ],
-            );
-          });
-    } else {
-      return Text('로딩중임');
-    }
-  }
-}
-
-class Upload extends StatelessWidget {
-  const Upload({Key? key, this.userImage,}) : super(key: key);
-  final userImage;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar( actions: [
-        IconButton(onPressed: (){
-          }, icon: Icon(Icons.send))
-      ],),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.file(userImage),
-          Text('이미지업로드화면'),
-          TextField(onChanged: (text){
-          },),
-          IconButton(onPressed: (){
-            Navigator.pop(context);
-          }, icon: Icon(Icons.close)),
-        ],
-      ),
-    );
-  }
-}
-
-class Store2 extends ChangeNotifier {
-  var name = 'john kim';
-}
-
-
-class Store1 extends ChangeNotifier {
-  var follower = 0;
-  var friend = false;
-  var profileImage = [];
-  
-  getData() async {
-    var result = await http.get(Uri.parse('https://codingapple1.github.io/app/profile.json'));
-    var result2 = jsonDecode(result.body);
-    profileImage = result2;
-    notifyListeners();
-  }
-  
-  addFollower(){
-    if (friend == false){
-      follower++;
-      friend = true;
-    } else {
-      follower--;
-      friend = false;
-    }
-    notifyListeners();
-  }
-}
-
-class Profile extends StatelessWidget {
-  const Profile({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(context.watch<Store2>().name),),
-      body : Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.grey,
-          ),
-          Text('팔로워 ${context.watch<Store1>().follower}명'),
-          ElevatedButton(onPressed: (){
-              context.read<Store1>().addFollower();
-          }, child: Text('팔로우')),
-          ElevatedButton(onPressed: (){
-            context.read<Store1>().getData();
-          }, child: Text('사진가져오기')),
-        ],
-      ),
-    );
-  }
-}
-
-
