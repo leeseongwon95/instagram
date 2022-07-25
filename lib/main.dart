@@ -7,17 +7,21 @@ import 'package:flutter/rendering.dart'; // 스크롤 관련 유용함
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    theme: style.theme,
-    // initialRoute: '/',
-    // routes: {
-    //   '/' : (c) => Text('첫페이지'),
-    //   '/detail' : (c) => Text('둘째페이지'), // 페이지 많으면 routes 사용해도됨
-    // },
-    home: MyApp(), // 복잡한 위젯은 복잡한위젯Theme() 안에서 스타일 줘야함
+  runApp(ChangeNotifierProvider(
+    create: (c) => Store1(),
+    child: MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: style.theme,
+      // initialRoute: '/',
+      // routes: {
+      //   '/' : (c) => Text('첫페이지'),
+      //   '/detail' : (c) => Text('둘째페이지'), // 페이지 많으면 routes 사용해도됨
+      // },
+      home: MyApp(), // 복잡한 위젯은 복잡한위젯Theme() 안에서 스타일 줘야함
+    ),
   ));
 }
 
@@ -243,14 +247,43 @@ class Upload extends StatelessWidget {
   }
 }
 
+class Store1 extends ChangeNotifier {
+  var name = 'john kim';
+  var follower = 0;
+  var friend = false;
+
+  addFollower(){
+    if (friend == false){
+      follower++;
+      friend = true;
+    } else {
+      follower--;
+      friend = false;
+    }
+    notifyListeners();
+  }
+}
+
 class Profile extends StatelessWidget {
   const Profile({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body : Text('프로필페이지'),
+      appBar: AppBar(title: Text(context.watch<Store1>().name),),
+      body : Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.grey,
+          ),
+          Text('팔로워 ${context.watch<Store1>().follower}명'),
+          ElevatedButton(onPressed: (){
+              context.read<Store1>().addFollower();
+          }, child: Text('팔로우')),
+        ],
+      ),
     );
   }
 }
