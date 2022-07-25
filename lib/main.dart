@@ -10,8 +10,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider(
-    create: (c) => Store1(),
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (c) => Store1()),
+      ChangeNotifierProvider(create: (c) => Store2()),
+    ],
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: style.theme,
@@ -247,11 +250,23 @@ class Upload extends StatelessWidget {
   }
 }
 
-class Store1 extends ChangeNotifier {
+class Store2 extends ChangeNotifier {
   var name = 'john kim';
+}
+
+
+class Store1 extends ChangeNotifier {
   var follower = 0;
   var friend = false;
-
+  var profileImage = [];
+  
+  getData() async {
+    var result = await http.get(Uri.parse('https://codingapple1.github.io/app/profile.json'));
+    var result2 = jsonDecode(result.body);
+    profileImage = result2;
+    notifyListeners();
+  }
+  
   addFollower(){
     if (friend == false){
       follower++;
@@ -270,7 +285,7 @@ class Profile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.watch<Store1>().name),),
+      appBar: AppBar(title: Text(context.watch<Store2>().name),),
       body : Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -282,6 +297,9 @@ class Profile extends StatelessWidget {
           ElevatedButton(onPressed: (){
               context.read<Store1>().addFollower();
           }, child: Text('팔로우')),
+          ElevatedButton(onPressed: (){
+            context.read<Store1>().getData();
+          }, child: Text('사진가져오기')),
         ],
       ),
     );
