@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/pages/upload.dart';
 import 'styles/style.dart' as style; // import 할 때 변수 중복문제 피하기
@@ -21,11 +20,6 @@ void main() {
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: style.theme,
-      // initialRoute: '/',
-      // routes: {
-      //   '/' : (c) => Text('첫페이지'),
-      //   '/detail' : (c) => Text('둘째페이지'), // 페이지 많으면 routes 사용해도됨
-      // },
       home: MyApp(), // 복잡한 위젯은 복잡한위젯Theme() 안에서 스타일 줘야함
     ),
   ));
@@ -51,9 +45,6 @@ class _MyAppState extends State<MyApp> {
     storage.setString('map', jsonEncode(map));
     var result = storage.getString('map') ?? '없음';
     print(jsonDecode(result)['age']);
-    // storage.setString('name', 'john');
-    // var result = storage.getString('name');
-    // print(result);
   }
 
   addData(a) {
