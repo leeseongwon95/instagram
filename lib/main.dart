@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instagram/notification.dart';
 import 'package:instagram/pages/upload.dart';
 import 'styles/style.dart' as style; // import 할 때 변수 중복문제 피하기
 import 'package:http/http.dart' as http;
@@ -10,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'stores/store1.dart';
 import 'stores/store2.dart';
 import 'pages/home.dart';
+import 'notification.dart';
 
 void main() {
   runApp(MultiProvider(
@@ -68,11 +70,15 @@ class _MyAppState extends State<MyApp> {
     super.initState(); // MyApp 위젯이 로드될 때 실행됨.
     saveData();
     getData();
+    initNotification(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(child: Text('+'), onPressed: (){
+        showNotification();
+      },),
       appBar: AppBar(
         title: Text('Instagram'),
         actions: [
