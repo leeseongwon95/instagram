@@ -16,6 +16,10 @@ var theme = ThemeData(
     actionsIconTheme: IconThemeData(color: Colors.black),
   ),
   textTheme: TextTheme(
-    bodyText2: TextStyle(color: Colors.black), // css style 태그 같은 느낌 ThemeData 위젯은 가까운 스타일을 가장먼저 적용함
+    bodyText2: TextStyle(color: Colors.black, fontSize: 30),
+    bodySmall: TextStyle(fontSize: 30)
+
+
+    // css style 태그 같은 느낌 ThemeData 위젯은 가까운 스타일을 가장먼저 적용함
 ), // 복잡한 위젯은 복잡한위젯Theme() 안에서 스타일 줘야함
 );
