@@ -47,7 +47,6 @@ class _HomeState extends State<Home> {
                 widget.data[i]['image'].runtimeType == String
                     ? Image.network(widget.data[i]['image'],)
                     : Image.file(widget.data[i]['image']) ,
-                //유저가 선택한 이미지는 _File타입임
                 GestureDetector(
                   child: Text(widget.data[i]['user']),
                   onTap: (){
